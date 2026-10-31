@@ -137,7 +137,8 @@
 
     <!-- Application Script Logic -->
     <script>
-        const LOGO_SRC = "https://lh3.googleusercontent.com/gg/AElqA72yAnkE7f8h4UeJ4oOxlQv9Hj5j_9mN6LdE8I9M=s1024";
+        // Menggunakan Gambar Lokal/Relatif ke file repo atau CDN fallback
+        const LOGO_SRC = "logo.png";
 
         const rateDisplay = document.getElementById('rate-display');
         const phpInput = document.getElementById('php-input');
@@ -149,7 +150,12 @@
         const liveDateTime = document.getElementById('live-date-time');
         const logoImg = document.getElementById('logo-img');
 
+        // Jika file logo.png lokal tidak ditemukan di repository, pakai fallback gambar SVG default
+        logoImg.onerror = function() {
+            this.src = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/svg/1f43b.svg";
+        };
         logoImg.src = LOGO_SRC;
+
         rateDisplay.innerText = `Rp ${DEFAULT_RATE.toLocaleString('id-ID')}`;
         summaryRate.innerText = `Rp ${DEFAULT_RATE.toLocaleString('id-ID')} / PHP`;
 
