@@ -9,7 +9,7 @@
     <!-- ⚙️ PENGATURAN KURS & TELEGRAM (EDIT DI SINI) -->
     <!-- ========================================================= -->
     <script>
-        const DEFAULT_RATE = 288;                // Ubah angka Rate/Kurs Beli Peso di sini
+        const DEFAULT_RATE = 285;                // Ubah angka Rate/Kurs Beli Peso di sini
         const TELEGRAM_USERNAME = "xecutivee";   // Username Telegram (tanpa tanda @)
     </script>
     <!-- ========================================================= -->
@@ -42,7 +42,7 @@
         <!-- Logo & Header Section -->
         <div class="text-center mb-6">
             <div class="inline-block relative mb-3">
-                <img id="logo-img" class="w-36 h-36 sm:w-44 sm:h-44 object-contain mx-auto drop-shadow-[0_10px_15px_rgba(234,179,8,0.3)] transition-transform hover:scale-105 duration-300" alt="Beruang Logo">
+                <img id="logo-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="w-36 h-36 sm:w-44 sm:h-44 object-contain mx-auto drop-shadow-[0_10px_15px_rgba(234,179,8,0.3)] transition-transform hover:scale-105 duration-300" alt="Beruang Logo">
             </div>
             
             <!-- Live Date & Time WIB Badge -->
@@ -89,14 +89,14 @@
                     </div>
                 </div>
 
-                <!-- Input IDR (Rupiah) -->
+                <!-- Input IDR (Rupiah) dengan format Titik -->
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1.5 ml-1">Total Pembayaran (IDR)</label>
                     <div class="relative rounded-2xl shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <span class="text-emerald-400 font-bold text-sm">Rp</span>
                         </div>
-                        <input type="number" id="idr-input" placeholder="0" min="0" step="any"
+                        <input type="text" id="idr-input" placeholder="0" autocomplete="off"
                             class="w-full pl-12 pr-4 py-3.5 bg-slate-800/90 border border-slate-700 rounded-2xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400 text-lg font-semibold text-white placeholder-slate-500 transition-all outline-none">
                     </div>
                 </div>
@@ -137,9 +137,6 @@
 
     <!-- Application Script Logic -->
     <script>
-        // Menggunakan Gambar Lokal/Relatif ke file repo atau CDN fallback
-        const LOGO_SRC = "logo.png";
-
         const rateDisplay = document.getElementById('rate-display');
         const phpInput = document.getElementById('php-input');
         const idrInput = document.getElementById('idr-input');
@@ -148,13 +145,6 @@
         const summaryTotal = document.getElementById('summary-total');
         const teleBtn = document.getElementById('tele-btn');
         const liveDateTime = document.getElementById('live-date-time');
-        const logoImg = document.getElementById('logo-img');
-
-        // Jika file logo.png lokal tidak ditemukan di repository, pakai fallback gambar SVG default
-        logoImg.onerror = function() {
-            this.src = "https://raw.githubusercontent.com/twitter/twemoji/master/assets/svg/1f43b.svg";
-        };
-        logoImg.src = LOGO_SRC;
 
         rateDisplay.innerText = `Rp ${DEFAULT_RATE.toLocaleString('id-ID')}`;
         summaryRate.innerText = `Rp ${DEFAULT_RATE.toLocaleString('id-ID')} / PHP`;
@@ -173,29 +163,43 @@
         updateLiveDateTime();
         setInterval(updateLiveDateTime, 1000);
 
+        // Format angka dengan titik ribuan
+        function formatRupiah(angka) {
+            if (isNaN(angka)) return "";
+            return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+        }
+
         function updateFromPHP() {
             const phpVal = parseFloat(phpInput.value) || 0;
             const totalIdr = Math.round(phpVal * DEFAULT_RATE);
 
-            idrInput.value = totalIdr > 0 ? totalIdr : '';
+            idrInput.value = totalIdr > 0 ? formatRupiah(totalIdr) : '';
             renderSummary(phpVal, totalIdr);
         }
 
         function updateFromIDR() {
-            const idrVal = parseFloat(idrInput.value) || 0;
-            const totalPhp = idrVal > 0 ? (idrVal / DEFAULT_RATE).toFixed(2) : 0;
-
-            phpInput.value = totalPhp > 0 ? totalPhp : '';
-            renderSummary(parseFloat(totalPhp), idrVal);
+            // Bersihkan titik sebelum menghitung
+            let rawValue = idrInput.value.replace(/\./g, '');
+            const idrVal = parseFloat(rawValue) || 0;
+            
+            if (idrVal > 0) {
+                idrInput.value = formatRupiah(idrVal);
+                const totalPhp = (idrVal / DEFAULT_RATE).toFixed(2);
+                phpInput.value = totalPhp;
+                renderSummary(parseFloat(totalPhp), idrVal);
+            } else {
+                phpInput.value = '';
+                renderSummary(0, 0);
+            }
         }
+
+        phpInput.addEventListener('input', updateFromPHP);
+        idrInput.addEventListener('input', updateFromIDR);
 
         function renderSummary(php, idr) {
             summaryPhp.innerText = `₱${php.toLocaleString('en-US')}`;
             summaryTotal.innerText = `Rp ${idr.toLocaleString('id-ID')}`;
         }
-
-        phpInput.addEventListener('input', updateFromPHP);
-        idrInput.addEventListener('input', updateFromIDR);
 
         teleBtn.addEventListener('click', () => {
             const cleanUsername = TELEGRAM_USERNAME.replace('@', '');
