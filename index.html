@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BERUANG - Jual Beli Peso</title>
+    
+    <!-- Favicon Logo Beruang di Tab Browser -->
+    <link rel="icon" type="image/png" href="logo.png">
 
     <!-- ========================================================= -->
     <!-- ⚙️ PENGATURAN KURS & TELEGRAM (EDIT DI SINI) -->
@@ -42,7 +45,7 @@
         <!-- Logo & Header Section -->
         <div class="text-center mb-6">
             <div class="inline-block relative mb-3">
-                <img id="logo-img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==" class="w-36 h-36 sm:w-44 sm:h-44 object-contain mx-auto drop-shadow-[0_10px_15px_rgba(234,179,8,0.3)] transition-transform hover:scale-105 duration-300" alt="Beruang Logo">
+                <img id="logo-img" src="logo.png" class="w-36 h-36 sm:w-44 sm:h-44 object-contain mx-auto drop-shadow-[0_10px_15px_rgba(234,179,8,0.3)] transition-transform hover:scale-105 duration-300" alt="Beruang Logo">
             </div>
             
             <!-- Live Date & Time WIB Badge -->
@@ -163,7 +166,6 @@
         updateLiveDateTime();
         setInterval(updateLiveDateTime, 1000);
 
-        // Format angka dengan titik ribuan
         function formatRupiah(angka) {
             if (isNaN(angka)) return "";
             return angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
@@ -178,7 +180,6 @@
         }
 
         function updateFromIDR() {
-            // Bersihkan titik sebelum menghitung
             let rawValue = idrInput.value.replace(/\./g, '');
             const idrVal = parseFloat(rawValue) || 0;
             
