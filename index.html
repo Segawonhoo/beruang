@@ -9,10 +9,10 @@
     <link rel="icon" type="image/png" href="logo.png">
 
     <!-- ========================================================= -->
-    <!-- ⚙️ PENGATURAN KURS & TELEGRAM (EDIT DI SINI) -->
+    <!-- ⚙️ PENGATURAN KURS OTOMATIS & MARGIN (EDIT DI SINI) -->
     <!-- ========================================================= -->
     <script>
-        const DEFAULT_RATE = 288;                // Ubah angka Rate/Kurs Beli Peso di sini
+        const RATE_MARGIN = 4;                  // Margin tambahan dari kurs pasar (misal: +4)
         const TELEGRAM_USERNAME = "xecutivee";   // Username Telegram (tanpa tanda @)
     </script>
     <!-- ========================================================= -->
@@ -53,7 +53,7 @@
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span id="live-date-time" class="font-medium tracking-wide">Mengambil Waktu...</span>
             </div>
-            <p class="text-xs text-slate-400">Update Kurs Real-time WIB</p>
+            <p class="text-xs text-slate-400">Update Kurs Otomatis & Real-time WIB</p>
         </div>
 
         <!-- Calculator Card -->
@@ -63,10 +63,10 @@
             <div class="bg-slate-900/80 border border-slate-700/60 rounded-2xl p-4 mb-5 flex items-center justify-between shadow-inner">
                 <div>
                     <span class="text-xs font-semibold text-slate-400 tracking-wider uppercase block">Harga Kurs Beli Hari Ini</span>
-                    <span class="text-xs text-slate-500">1 PHP (Peso)</span>
+                    <span id="base-rate-info" class="text-xs text-slate-500">Memuat kurs pasar...</span>
                 </div>
                 <div class="text-right">
-                    <span id="rate-display" class="text-2xl font-extrabold text-amber-400 tracking-tight">Rp 0</span>
+                    <span id="rate-display" class="text-2xl font-extrabold text-amber-400 tracking-tight">Memuat...</span>
                 </div>
             </div>
 
@@ -140,7 +140,10 @@
 
     <!-- Application Script Logic -->
     <script>
+        let CURRENT_RATE = 285; // Fallback default
+
         const rateDisplay = document.getElementById('rate-display');
+        const baseRateInfo = document.getElementById('base-rate-info');
         const phpInput = document.getElementById('php-input');
         const idrInput = document.getElementById('idr-input');
         const summaryPhp = document.getElementById('summary-php');
@@ -149,8 +152,34 @@
         const teleBtn = document.getElementById('tele-btn');
         const liveDateTime = document.getElementById('live-date-time');
 
-        rateDisplay.innerText = `Rp ${DEFAULT_RATE.toLocaleString('id-ID')}`;
-        summaryRate.innerText = `Rp ${DEFAULT_RATE.toLocaleString('id-ID')} / PHP`;
+        // Ambil Kurs Otomatis dan Bulatkan ke Bawah (Tanpa Koma)
+        async function fetchLiveRate() {
+            try {
+                const response = await fetch('https://api.exchangerate-api.com/v4/latest/PHP');
+                const data = await response.json();
+                
+                if (data && data.rates && data.rates.IDR) {
+                    let marketRateFloat = data.rates.IDR; // contoh: 284.54
+                    let marketRateInt = Math.floor(marketRateFloat); // diambil bulat: 284
+                    
+                    // Ditambah margin +4 menjadi 288
+                    CURRENT_RATE = marketRateInt + RATE_MARGIN; 
+
+                    rateDisplay.innerText = `Rp ${CURRENT_RATE.toLocaleString('id-ID')}`;
+                    baseRateInfo.innerText = `Pasar: ~Rp ${marketRateInt} (+${RATE_MARGIN})`;
+                    summaryRate.innerText = `Rp ${CURRENT_RATE.toLocaleString('id-ID')} / PHP`;
+                    
+                    updateFromPHP();
+                }
+            } catch (error) {
+                console.error("Gagal mengambil kurs otomatis:", error);
+                rateDisplay.innerText = `Rp ${CURRENT_RATE}`;
+                baseRateInfo.innerText = `1 PHP (Peso)`;
+                summaryRate.innerText = `Rp ${CURRENT_RATE} / PHP`;
+            }
+        }
+
+        fetchLiveRate();
 
         function updateLiveDateTime() {
             const now = new Date();
@@ -173,7 +202,7 @@
 
         function updateFromPHP() {
             const phpVal = parseFloat(phpInput.value) || 0;
-            const totalIdr = Math.round(phpVal * DEFAULT_RATE);
+            const totalIdr = Math.round(phpVal * CURRENT_RATE);
 
             idrInput.value = totalIdr > 0 ? formatRupiah(totalIdr) : '';
             renderSummary(phpVal, totalIdr);
@@ -185,7 +214,7 @@
             
             if (idrVal > 0) {
                 idrInput.value = formatRupiah(idrVal);
-                const totalPhp = (idrVal / DEFAULT_RATE).toFixed(2);
+                const totalPhp = (idrVal / CURRENT_RATE).toFixed(2);
                 phpInput.value = totalPhp;
                 renderSummary(parseFloat(totalPhp), idrVal);
             } else {
