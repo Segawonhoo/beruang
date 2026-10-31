@@ -33,6 +33,10 @@
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
         }
+        /* Coding tambahan untuk menghilangkan sisa putih / blending background logo */
+        #logo-img {
+            mix-blend-mode: screen; /* Otomatis menghilangkan warna dasar putih/terang pada gambar */
+        }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col justify-between p-4 sm:p-6 relative overflow-x-hidden">
