@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BERUANG - Jual Beli Peso</title>
+
+    <!-- ========================================================= -->
+    <!-- ⚙️ PENGATURAN KURS & TELEGRAM (EDIT DI SINI) -->
+    <!-- ========================================================= -->
+    <script>
+        const DEFAULT_RATE = 285;                // Ubah angka Rate/Kurs Beli Peso di sini
+        const TELEGRAM_USERNAME = "xecutivee";   // Username Telegram (tanpa tanda @)
+    </script>
+    <!-- ========================================================= -->
+
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Inter & Poppins -->
@@ -12,11 +22,6 @@
         body {
             font-family: 'Poppins', 'Inter', sans-serif;
             background-color: #0f172a;
-        }
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #FDE047 0%, #EAB308 50%, #CA8A04 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
         }
         .gold-bg-gradient {
             background: linear-gradient(135deg, #FACC15 0%, #EAB308 100%);
@@ -58,7 +63,7 @@
                     <span class="text-xs text-slate-500">1 PHP (Peso)</span>
                 </div>
                 <div class="text-right">
-                    <span id="rate-display" class="text-2xl font-extrabold text-amber-400 tracking-tight">Rp 285</span>
+                    <span id="rate-display" class="text-2xl font-extrabold text-amber-400 tracking-tight">Rp 0</span>
                 </div>
             </div>
 
@@ -113,67 +118,45 @@
                     </div>
                 </div>
 
-                <!-- WhatsApp Order Button -->
-                <button type="button" id="wa-btn" 
+                <!-- Telegram Order Button -->
+                <button type="button" id="tele-btn" 
                     class="w-full gold-bg-gradient text-slate-950 font-bold py-4 px-6 rounded-2xl shadow-lg hover:brightness-110 active:scale-[0.99] transition-all flex items-center justify-center gap-2 mt-2">
                     <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                        <path d="M12 0C5.37 0 0 5.37 0 12s5.37 12 12 12 12-5.37 12-12S18.63 0 12 0zm5.568 8.162l-2.01 9.471c-.15.672-.548.834-1.112.518l-3.074-2.267-1.483 1.427c-.164.164-.303.303-.621.303l.221-3.136 5.711-5.158c.248-.22-.054-.342-.386-.121l-7.058 4.444-3.037-.95c-.66-.206-.673-.66.138-.977l11.87-4.575c.55-.2.1.031.842.366z"/>
                     </svg>
-                    Pesan via WhatsApp
+                    Pesan via Telegram
                 </button>
             </form>
         </div>
 
         <!-- Footer -->
         <div class="text-center mt-6 text-xs text-slate-500">
-            © BERUANG - Jual Beli Peso Филиппины
+            © BERUANG - Jual Beli Peso
         </div>
     </main>
 
+    <!-- Application Script Logic -->
     <script>
-        // ==========================================
-        // CONFIGURASI ADMIN & KURS (Ubah Di Sini)
-        // ==========================================
-        const DEFAULT_RATE = 285;            // Ubah harga Kurs Beli per 1 PHP
-        const ADMIN_WA_NUMBER = "6281234567890"; // Nomor WA Admin (gunakan kode negara 62)
-
-        // Logo Image URL (Gambar Logo Beruang)
         const LOGO_SRC = "https://lh3.googleusercontent.com/gg/AElqA72yAnkE7f8h4UeJ4oOxlQv9Hj5j_9mN6LdE8I9M=s1024";
 
-        // Dynamic Elements
         const rateDisplay = document.getElementById('rate-display');
         const phpInput = document.getElementById('php-input');
         const idrInput = document.getElementById('idr-input');
         const summaryPhp = document.getElementById('summary-php');
         const summaryRate = document.getElementById('summary-rate');
         const summaryTotal = document.getElementById('summary-total');
-        const waBtn = document.getElementById('wa-btn');
+        const teleBtn = document.getElementById('tele-btn');
         const liveDateTime = document.getElementById('live-date-time');
         const logoImg = document.getElementById('logo-img');
 
-        // Set Logo
         logoImg.src = LOGO_SRC;
-
-        // Set Default Rate Display
         rateDisplay.innerText = `Rp ${DEFAULT_RATE.toLocaleString('id-ID')}`;
         summaryRate.innerText = `Rp ${DEFAULT_RATE.toLocaleString('id-ID')} / PHP`;
 
-        // Live Real-Time Date & Time (Asia/Jakarta - WIB)
         function updateLiveDateTime() {
             const now = new Date();
-            const optionsDate = { 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric',
-                timeZone: 'Asia/Jakarta'
-            };
-            const optionsTime = {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false,
-                timeZone: 'Asia/Jakarta'
-            };
+            const optionsDate = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' };
+            const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' };
 
             const dateStr = now.toLocaleDateString('id-ID', optionsDate);
             const timeStr = now.toLocaleTimeString('id-ID', optionsTime);
@@ -184,7 +167,6 @@
         updateLiveDateTime();
         setInterval(updateLiveDateTime, 1000);
 
-        // Calculation Logic
         function updateFromPHP() {
             const phpVal = parseFloat(phpInput.value) || 0;
             const totalIdr = Math.round(phpVal * DEFAULT_RATE);
@@ -209,30 +191,9 @@
         phpInput.addEventListener('input', updateFromPHP);
         idrInput.addEventListener('input', updateFromIDR);
 
-        // WhatsApp Direct Integration
-        waBtn.addEventListener('click', () => {
-            const phpVal = parseFloat(phpInput.value) || 0;
-            const idrVal = parseFloat(idrInput.value) || 0;
-
-            if (phpVal <= 0) {
-                alert('Silakan masukkan jumlah Peso yang ingin dibeli.');
-                phpInput.focus();
-                return;
-            }
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' });
-            const timeStr = now.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Jakarta' });
-
-            const text = `Halo Admin BERUANG, saya mau beli Peso (PHP):\n\n` +
-                         `Tanggal: ${dateStr} (${timeStr} WIB)\n` +
-                         `Jumlah Beli: ₱${phpVal.toLocaleString('en-US')}\n` +
-                         `Rate: Rp ${DEFAULT_RATE.toLocaleString('id-ID')}\n` +
-                         `Total Bayar: Rp ${idrVal.toLocaleString('id-ID')}\n\n` +
-                         `Mohon diproses, terima kasih!`;
-
-            const encodedText = encodeURIComponent(text);
-            window.open(`https://wa.me/${ADMIN_WA_NUMBER}?text=${encodedText}`, '_blank');
+        teleBtn.addEventListener('click', () => {
+            const cleanUsername = TELEGRAM_USERNAME.replace('@', '');
+            window.open(`https://t.me/${cleanUsername}`, '_blank');
         });
     </script>
 </body>
