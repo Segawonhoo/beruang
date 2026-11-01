@@ -69,7 +69,7 @@
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span id="live-date-time" class="font-medium tracking-wide">Mengambil Waktu...</span>
             </div>
-            <p class="text-xs text-slate-400">Update Kurs Real-time PH (Manila)</p>
+            <p class="text-xs text-slate-400">Update Kurs & Real-time PH (Manila)</p>
         </div>
 
         <!-- Calculator Card -->
@@ -157,6 +157,8 @@
     <!-- Application Script Logic -->
     <script>
         let CURRENT_RATE = 285; // Fallback default
+        let currentPhpValue = 0;
+        let currentIdrValue = 0;
 
         const rateDisplay = document.getElementById('rate-display');
         const phpInput = document.getElementById('php-input');
@@ -218,13 +220,17 @@
             
             if (phpVal > 0) {
                 phpInput.value = formatRupiah(Math.floor(phpVal));
-                
                 const totalIdr = Math.round(phpVal * CURRENT_RATE);
                 idrInput.value = totalIdr > 0 ? formatRupiah(totalIdr) : '';
+                
+                currentPhpValue = phpVal;
+                currentIdrValue = totalIdr;
                 renderSummary(phpVal, totalIdr);
             } else {
                 phpInput.value = '';
                 idrInput.value = '';
+                currentPhpValue = 0;
+                currentIdrValue = 0;
                 renderSummary(0, 0);
             }
         }
@@ -238,10 +244,15 @@
                 const totalPhp = (idrVal / CURRENT_RATE);
                 
                 phpInput.value = formatRupiah(Math.floor(totalPhp));
+                
+                currentPhpValue = totalPhp;
+                currentIdrValue = idrVal;
                 renderSummary(totalPhp, idrVal);
             } else {
                 phpInput.value = '';
-                idrInput.value = '';
+                phpInput.value = '';
+                currentPhpValue = 0;
+                currentIdrValue = 0;
                 renderSummary(0, 0);
             }
         }
@@ -255,8 +266,20 @@
         }
 
         teleBtn.addEventListener('click', () => {
+            if (currentPhpValue <= 0 || currentIdrValue <= 0) {
+                alert("Silakan masukkan nominal Peso atau Rupiah terlebih dahulu!");
+                return;
+            }
+
             const cleanUsername = TELEGRAM_USERNAME.replace('@', '');
-            window.open(`https://t.me/${cleanUsername}`, '_blank');
+            
+            // Format pesan sesuai permintaan Anda
+            const formattedPhp = Math.round(currentPhpValue).toLocaleString('id-ID');
+            const formattedIdr = currentIdrValue.toLocaleString('id-ID');
+            
+            const message = `Order: ${formattedPhp}\nTotal: Rp.${formattedIdr}`;
+            
+            window.open(`https://t.me/${cleanUsername}?text=${encodeURIComponent(message)}`, '_blank');
         });
     </script>
 </body>
