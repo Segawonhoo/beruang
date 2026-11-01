@@ -75,11 +75,11 @@
         <!-- Calculator Card -->
         <div class="card-blur border border-amber-500/20 rounded-3xl p-5 sm:p-7 shadow-2xl relative">
             
-            <!-- Kurs Beli Info Box (Read Only) -->
+            <!-- Kurs Beli Info Box -->
             <div class="bg-slate-900/80 border border-slate-700/60 rounded-2xl p-4 mb-5 flex items-center justify-between shadow-inner">
                 <div>
-                    <span id="rate-title" class="text-xs font-semibold text-slate-400 tracking-wider uppercase block">Harga Kurs Beli Hari Ini</span>
-                    <span id="rate-unit" class="text-xs text-slate-500">1 PHP (Peso)</span>
+                    <span class="text-xs font-semibold text-slate-400 tracking-wider uppercase block">Harga Kurs Beli Hari Ini</span>
+                    <span class="text-xs text-slate-500">1 PHP (Peso)</span>
                 </div>
                 <div class="text-right">
                     <span id="rate-display" class="text-2xl font-extrabold text-amber-400 tracking-tight">Memuat...</span>
@@ -87,7 +87,7 @@
             </div>
 
             <form id="calc-form" class="space-y-4" onsubmit="return false;">
-                <!-- Input Atas (Dinamis: PHP atau IDR) -->
+                <!-- Input Atas (Dinamis) -->
                 <div>
                     <label id="label-top" class="block text-xs font-medium text-slate-300 mb-1.5 ml-1">Jumlah Peso yang Dibeli (PHP)</label>
                     <div class="relative rounded-2xl shadow-sm">
@@ -99,7 +99,7 @@
                     </div>
                 </div>
 
-                <!-- Tombol Swap / Terbalik (Bisa Diklik) -->
+                <!-- Tombol Swap / Terbalik -->
                 <div class="flex justify-center -my-2 relative z-10">
                     <button type="button" id="swap-btn" class="bg-slate-800 border border-slate-700 text-amber-400 rounded-full p-2.5 shadow-md hover:bg-slate-700 active:scale-95 transition-all cursor-pointer focus:outline-none" title="Balik Posisi Perhitungan">
                         <svg xmlns="http://www.w3.org/2000/svg" id="swap-icon" class="h-4 w-4 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -108,7 +108,7 @@
                     </button>
                 </div>
 
-                <!-- Input Bawah (Dinamis: IDR atau PHP) -->
+                <!-- Input Bawah (Dinamis) -->
                 <div>
                     <label id="label-bottom" class="block text-xs font-medium text-slate-300 mb-1.5 ml-1">Total Pembayaran (IDR)</label>
                     <div class="relative rounded-2xl shadow-sm">
@@ -157,13 +157,12 @@
     <!-- Application Script Logic -->
     <script>
         let CURRENT_RATE = 285; // Fallback default
-        let isPhpToIdr = true;   // Status arah mode kalkulator
+        let isPhpToIdr = true;   // Mode kalkulator
 
         let currentPhpValue = 0;
         let currentIdrValue = 0;
 
         const rateDisplay = document.getElementById('rate-display');
-        const rateUnit = document.getElementById('rate-unit');
         const inputTop = document.getElementById('input-top');
         const inputBottom = document.getElementById('input-bottom');
         const labelTop = document.getElementById('label-top');
@@ -200,17 +199,9 @@
         }
 
         function updateRateDisplay() {
-            if (isPhpToIdr) {
-                rateDisplay.innerText = `Rp ${CURRENT_RATE.toLocaleString('id-ID')}`;
-                rateUnit.innerText = "1 PHP (Peso)";
-                summaryRate.innerText = `Rp ${CURRENT_RATE.toLocaleString('id-ID')} / PHP`;
-            } else {
-                // Jika dibalik, hitung nilai per 1 IDR dalam bentuk PHP desimal
-                let ratePerIdr = (1 / CURRENT_RATE).toFixed(4);
-                rateDisplay.innerText = `${ratePerIdr} PHP`;
-                rateUnit.innerText = "1 IDR (Rupiah)";
-                summaryRate.innerText = `1 IDR = ${ratePerIdr} PHP`;
-            }
+            // Selalu konsisten menampilkan kurs Rupiah per PHP di kotak atas dan rincian bawah
+            rateDisplay.innerText = `Rp ${CURRENT_RATE.toLocaleString('id-ID')}`;
+            summaryRate.innerText = `Rp ${CURRENT_RATE.toLocaleString('id-ID')} / PHP`;
         }
 
         fetchLiveRate();
@@ -316,7 +307,6 @@
             currentPhpValue = 0;
             currentIdrValue = 0;
             renderSummary(0, 0);
-            updateRateDisplay();
         });
 
         inputTop.addEventListener('input', calculate);
