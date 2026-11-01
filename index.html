@@ -12,7 +12,7 @@
     <!-- ⚙️ PENGATURAN KURS OTOMATIS & MARGIN (EDIT DI SINI) -->
     <!-- ========================================================= -->
     <script>
-        const RATE_MARGIN = 4;                  // Margin tambahan dari kurs pasar (misal: +4)
+        const RATE_MARGIN = 4;                // Margin tambahan dari kurs pasar (misal: +4)
         const TELEGRAM_USERNAME = "xecutivee";   // Username Telegram (tanpa tanda @)
     </script>
     <!-- ========================================================= -->
@@ -215,12 +215,15 @@
         function updateFromPHP() {
             let rawValue = phpInput.value.replace(/\./g, '').replace(',', '.');
             const phpVal = parseFloat(rawValue) || 0;
-            const totalIdr = Math.round(phpVal * CURRENT_RATE);
-
+            
             if (phpVal > 0) {
+                phpInput.value = formatRupiah(Math.floor(phpVal));
+                
+                const totalIdr = Math.round(phpVal * CURRENT_RATE);
                 idrInput.value = totalIdr > 0 ? formatRupiah(totalIdr) : '';
                 renderSummary(phpVal, totalIdr);
             } else {
+                phpInput.value = '';
                 idrInput.value = '';
                 renderSummary(0, 0);
             }
@@ -232,11 +235,13 @@
             
             if (idrVal > 0) {
                 idrInput.value = formatRupiah(idrVal);
-                const totalPhp = (idrVal / CURRENT_RATE).toFixed(2);
-                phpInput.value = totalPhp; // Nilai PHP mentah untuk perhitungan
-                renderSummary(parseFloat(totalPhp), idrVal);
+                const totalPhp = (idrVal / CURRENT_RATE);
+                
+                phpInput.value = formatRupiah(Math.floor(totalPhp));
+                renderSummary(totalPhp, idrVal);
             } else {
                 phpInput.value = '';
+                idrInput.value = '';
                 renderSummary(0, 0);
             }
         }
@@ -245,7 +250,7 @@
         idrInput.addEventListener('input', updateFromIDR);
 
         function renderSummary(php, idr) {
-            summaryPhp.innerText = `₱${php.toLocaleString('en-US')}`;
+            summaryPhp.innerText = `₱${Math.round(php).toLocaleString('id-ID')}`;
             summaryTotal.innerText = `Rp ${idr.toLocaleString('id-ID')}`;
         }
 
