@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BERUANG EXCHANGER</title>
+    <title>BERUANG EXCHANGE</title>
     
     <!-- Favicon Logo Beruang -->
-    <link rel="icon" type="image/png" href="logo.png?v=4">
+    <link rel="icon" type="image/png" href="logo.png?v=5">
 
     <!-- ========================================================= -->
     <!-- ⚙️ PENGATURAN KURS OTOMATIS & MARGIN (EDIT DI SINI) -->
@@ -33,7 +33,6 @@
             background: rgba(30, 41, 59, 0.85);
             backdrop-filter: blur(12px);
         }
-        /* Memperbesar ukuran wadah dan logo agar tampil lebih besar dan proporsional */
         .logo-container {
             width: 100%;
             max-width: 320px;
@@ -48,7 +47,7 @@
             width: 100%;
             height: 100%;
             object-fit: contain;
-            transform: scale(1.6); /* Diperbesar lebih besar agar jelas */
+            transform: scale(1.6);
         }
     </style>
 </head>
@@ -61,17 +60,16 @@
     <main class="max-w-md w-full mx-auto my-auto relative z-10">
         <!-- Logo & Header Section -->
         <div class="text-center mb-5">
-            <!-- Container Logo yang diperbesar -->
             <div class="logo-container mb-3 relative">
-                <img id="logo-img" src="logo.png?v=4" class="drop-shadow-[0_12px_20px_rgba(234,179,8,0.35)] transition-transform hover:scale-105 duration-300" alt="Beruang Logo">
+                <img id="logo-img" src="logo.png?v=5" class="drop-shadow-[0_12px_20px_rgba(234,179,8,0.35)] transition-transform hover:scale-105 duration-300" alt="Beruang Logo">
             </div>
             
-            <!-- Live Date & Time WIB Badge -->
+            <!-- Live Date & Time PH Badge -->
             <div class="inline-flex items-center gap-2 bg-slate-800/90 border border-amber-500/30 px-3.5 py-1.5 rounded-full text-xs sm:text-sm text-amber-300 shadow-inner mb-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                 <span id="live-date-time" class="font-medium tracking-wide">Mengambil Waktu...</span>
             </div>
-            <p class="text-xs text-slate-400">Update Kurs Otomatis & Real-time WIB</p>
+            <p class="text-xs text-slate-400">Update Kurs Otomatis & Real-time PH (Manila)</p>
         </div>
 
         <!-- Calculator Card -->
@@ -89,14 +87,14 @@
             </div>
 
             <form id="calc-form" class="space-y-4" onsubmit="return false;">
-                <!-- Input PHP (Peso) -->
+                <!-- Input PHP (Peso) dengan Format Titik -->
                 <div>
                     <label class="block text-xs font-medium text-slate-300 mb-1.5 ml-1">Jumlah Peso yang Dibeli (PHP)</label>
                     <div class="relative rounded-2xl shadow-sm">
                         <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                             <span class="text-amber-400 font-bold text-lg">₱</span>
                         </div>
-                        <input type="number" id="php-input" placeholder="0" min="0" step="any"
+                        <input type="text" id="php-input" placeholder="0" autocomplete="off"
                             class="w-full pl-10 pr-4 py-3.5 bg-slate-800/90 border border-slate-700 rounded-2xl focus:ring-2 focus:ring-amber-400 focus:border-amber-400 text-lg font-semibold text-white placeholder-slate-500 transition-all outline-none">
                     </div>
                 </div>
@@ -152,7 +150,7 @@
 
         <!-- Footer -->
         <div class="text-center mt-6 text-xs text-slate-500">
-            © BERUANG EXCHANGER - Jual Beli Peso
+            © BERUANG EXCHANGE
         </div>
     </main>
 
@@ -194,15 +192,16 @@
 
         fetchLiveRate();
 
+        // Menggunakan Zona Waktu Filipina (Asia/Manila)
         function updateLiveDateTime() {
             const now = new Date();
-            const optionsDate = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Jakarta' };
-            const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Jakarta' };
+            const optionsDate = { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Asia/Manila' };
+            const optionsTime = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false, timeZone: 'Asia/Manila' };
 
             const dateStr = now.toLocaleDateString('id-ID', optionsDate);
             const timeStr = now.toLocaleTimeString('id-ID', optionsTime);
 
-            liveDateTime.innerText = `${dateStr} • ${timeStr} WIB`;
+            liveDateTime.innerText = `${dateStr} • ${timeStr} PH`;
         }
 
         updateLiveDateTime();
@@ -214,11 +213,17 @@
         }
 
         function updateFromPHP() {
-            const phpVal = parseFloat(phpInput.value) || 0;
+            let rawValue = phpInput.value.replace(/\./g, '').replace(',', '.');
+            const phpVal = parseFloat(rawValue) || 0;
             const totalIdr = Math.round(phpVal * CURRENT_RATE);
 
-            idrInput.value = totalIdr > 0 ? formatRupiah(totalIdr) : '';
-            renderSummary(phpVal, totalIdr);
+            if (phpVal > 0) {
+                idrInput.value = totalIdr > 0 ? formatRupiah(totalIdr) : '';
+                renderSummary(phpVal, totalIdr);
+            } else {
+                idrInput.value = '';
+                renderSummary(0, 0);
+            }
         }
 
         function updateFromIDR() {
@@ -228,7 +233,7 @@
             if (idrVal > 0) {
                 idrInput.value = formatRupiah(idrVal);
                 const totalPhp = (idrVal / CURRENT_RATE).toFixed(2);
-                phpInput.value = totalPhp;
+                phpInput.value = totalPhp; // Nilai PHP mentah untuk perhitungan
                 renderSummary(parseFloat(totalPhp), idrVal);
             } else {
                 phpInput.value = '';
