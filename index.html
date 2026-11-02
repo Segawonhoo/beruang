@@ -172,7 +172,7 @@
 
     <!-- Application Script Logic -->
     <script>
-        let CURRENT_RATE = 285; // Fallback default
+        let CURRENT_RATE = 289; // Fallback default
         let isPhpToIdr = true;   // Mode kalkulator
 
         let currentPhpValue = 0;
@@ -229,7 +229,7 @@
                 
                 if (data && data.rates && data.rates.IDR) {
                     let marketRateFloat = data.rates.IDR; 
-                    let marketRateInt = Math.floor(marketRateFloat); 
+                    let marketRateInt = Math.round(marketRateFloat); // Menggunakan Math.round agar pembulatan normal (285,49 -> 285)
                     
                     CURRENT_RATE = marketRateInt + RATE_MARGIN; 
 
