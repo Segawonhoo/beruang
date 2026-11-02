@@ -222,10 +222,10 @@
             if (e.target === customAlert) hideAlert();
         });
 
-        // Fungsi Mengambil Kurs Otomatis
+        // Menggunakan API Real-time (Frankfurter API)
         async function fetchLiveRate() {
             try {
-                const response = await fetch('https://api.exchangerate-api.com/v4/latest/PHP');
+                const response = await fetch('https://api.frankfurter.app/latest?from=PHP&to=IDR');
                 const data = await response.json();
                 
                 if (data && data.rates && data.rates.IDR) {
