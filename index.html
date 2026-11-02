@@ -12,7 +12,7 @@
     <!-- ⚙️ PENGATURAN KURS OTOMATIS & MARGIN (EDIT DI SINI) -->
     <!-- ========================================================= -->
     <script>
-        const RATE_MARGIN = 4;                // Margin tambahan dari kurs pasar
+        const RATE_MARGIN = 5;                // Margin tambahan dari kurs pasar
         const TELEGRAM_USERNAME = "xecutivee";   // Username Telegram (tanpa tanda @)
     </script>
     <!-- ========================================================= -->
@@ -185,6 +185,7 @@
         const labelBottom = document.getElementById('label-bottom');
         const symbolTop = document.getElementById('symbol-top');
         const symbolBottom = document.getElementById('symbol-bottom');
+        const symbolBottom = document.getElementById('symbol-bottom');
         const swapBtn = document.getElementById('swap-btn');
         const swapIcon = document.getElementById('swap-icon');
 
@@ -222,6 +223,7 @@
             if (e.target === customAlert) hideAlert();
         });
 
+        // Fungsi Mengambil Kurs Otomatis (Dengan Math.round)
         async function fetchLiveRate() {
             try {
                 const response = await fetch('https://api.exchangerate-api.com/v4/latest/PHP');
@@ -229,7 +231,7 @@
                 
                 if (data && data.rates && data.rates.IDR) {
                     let marketRateFloat = data.rates.IDR; 
-                    let marketRateInt = Math.round(marketRateFloat); // Menggunakan Math.round agar pembulatan normal (285,49 -> 285)
+                    let marketRateInt = Math.round(marketRateFloat); // Pembulatan normal ke terdekat
                     
                     CURRENT_RATE = marketRateInt + RATE_MARGIN; 
 
@@ -247,7 +249,11 @@
             summaryRate.innerText = `Rp ${CURRENT_RATE.toLocaleString('id-ID')} / PHP`;
         }
 
+        // Panggil pertama kali saat halaman dibuka
         fetchLiveRate();
+
+        // 🔄 SET AUTO-UPDATE RATE SETIAP 1 JAM SEKALI (3600000 milidetik)
+        setInterval(fetchLiveRate, 60 * 60 * 1000);
 
         // Menggunakan Zona Waktu Filipina (Asia/Manila)
         function updateLiveDateTime() {
