@@ -12,7 +12,7 @@
     <!-- ⚙️ PENGATURAN KURS OTOMATIS & MARGIN (EDIT DI SINI) -->
     <!-- ========================================================= -->
     <script>
-        const RATE_MARGIN = 4;                // Margin tambahan dari kurs pasar
+        const RATE_MARGIN = 4;                // Margin diset +4
         const TELEGRAM_USERNAME = "xecutivee";   // Username Telegram (tanpa tanda @)
     </script>
     <!-- ========================================================= -->
@@ -172,7 +172,7 @@
 
     <!-- Application Script Logic -->
     <script>
-        let CURRENT_RATE = 291; // Fallback default
+        let CURRENT_RATE = 290; // Fallback default
         let isPhpToIdr = true;   // Mode kalkulator
 
         let currentPhpValue = 0;
@@ -222,10 +222,10 @@
             if (e.target === customAlert) hideAlert();
         });
 
-        // Menggunakan API Real-time (Frankfurter API)
+        // Mengambil Kurs Real-Time dari Open Exchange Rates (Open Access)
         async function fetchLiveRate() {
             try {
-                const response = await fetch('https://api.frankfurter.app/latest?from=PHP&to=IDR');
+                const response = await fetch('https://open.er-api.com/v6/latest/PHP');
                 const data = await response.json();
                 
                 if (data && data.rates && data.rates.IDR) {
